@@ -11,7 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <ProjectReference Include="..\FakeCommerce.DataAccess\FakeCommerce.DataAccess.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ViewModels\Basket\" />
+    <Folder Include="ViewModels\Products\" />
   </ItemGroup>
 
 </Project>
