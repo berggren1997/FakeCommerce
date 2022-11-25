@@ -3,7 +3,7 @@
     public class Basket
     {
         public int Id { get; set; }
-        public int BuyerId { get; set; }
+        public string BuyerId { get; set; } = string.Empty;
         public List<BasketItem> Items { get; set; } = new();
 
         /// <summary>
