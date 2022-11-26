@@ -17,11 +17,6 @@ namespace FakeCommerce.Api.Services.Basket
             //Få fram användarens shopping-cart
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
             //var basket2 = await RetrieveBasket(buyerId);
-            if (basket == null)
-            {
-                //TODO: Skapa en anonym shoppingcart
-                return null;
-            }
             // Check that product exists
             var product = await _repository.ProductRepository.GetProduct(productId, trackChanges: false);
             if (product == null)
@@ -29,25 +24,12 @@ namespace FakeCommerce.Api.Services.Basket
                 //TODO: Kasta custom exception
                 return null;
             }
-            //Lägg till produkten i shopping-cart + spara
-            basket.AddItem(product, quantity);
+            //basket kan inte vara null här, då kontrollern säkerställer att vi har/skapar en
+            //ny shoppingcart innan det läggs till
+            basket!.AddItem(product, quantity);
             await _repository.SaveAsync();
-            //Returnera basketdto
+            
             return MapBasketToDto(basket);
-            //return new BasketDto
-            //{
-            //    Id = basket.Id,
-            //    BuyerId = basket.BuyerId,
-            //    BasketItems = basket.Items.Select(item => new BasketItemDto
-            //    {
-            //        ProductId = item.Product.Id,
-            //        Name = item.Product.Name,
-            //        Description = item.Product.Description,
-            //        PictureUrl = item.Product.PictureUrl,
-            //        Price = item.Product.Price,
-            //        Quantity = item.Product.Price
-            //    }).ToList()
-            //};
         }
 
         public async Task<BasketDto> GetBasket(string buyerId)
@@ -98,7 +80,7 @@ namespace FakeCommerce.Api.Services.Basket
                     Description = item.Product.Description,
                     PictureUrl = item.Product.PictureUrl,
                     Price = item.Product.Price,
-                    Quantity = item.Product.Price,
+                    Quantity = item.Quantity,
                     ProductId = item.ProductId
                 }).ToList()
             };

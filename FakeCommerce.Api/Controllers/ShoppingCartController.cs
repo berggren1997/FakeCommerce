@@ -1,5 +1,4 @@
-﻿
-using FakeCommerce.Api.Services;
+﻿using FakeCommerce.Api.Services;
 using FakeCommerce.Api.ViewModels.Basket;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,18 +26,18 @@ namespace FakeCommerce.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddItemToBasket(int productId, int quantity)
         {
-            var currentBasket = await _service.BasketService.GetBasket(GetBuyerId());
-            if(currentBasket == null)
+            var basket = await _service.BasketService.GetBasket(GetBuyerId());
+            if(basket == null)
             {
-                currentBasket = await CreateBasket();
+                basket = await CreateBasket();
             }
-            var basket = await _service.BasketService.AddItemToBasket(productId, quantity, GetBuyerId());
-            return Ok(basket);
+            var currentBasket = await _service.BasketService.AddItemToBasket(productId, quantity, basket.BuyerId);
+            return Ok(currentBasket);
         }
 
         private async Task<BasketDto> CreateBasket()
         {
-            var buyerId = User.Identity.Name;
+            var buyerId = User.Identity?.Name;
 
             if (string.IsNullOrEmpty(buyerId))
             {
@@ -55,6 +54,6 @@ namespace FakeCommerce.Api.Controllers
             return basket;
         }
 
-        private string GetBuyerId() => User?.Identity?.Name ?? Request.Cookies["buyerId"];
+        private string? GetBuyerId() => User.Identity?.Name ?? Request.Cookies["buyerId"];
     }
 }
