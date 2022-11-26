@@ -2,6 +2,8 @@
 using FakeCommerce.DataAccess.Data;
 using FakeCommerce.DataAccess.Repositories.Implementations;
 using FakeCommerce.DataAccess.Repositories.Interfaces;
+using FakeCommerce.Entities.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace FakeCommerce.Api.Extensions.Service
@@ -25,6 +27,20 @@ namespace FakeCommerce.Api.Extensions.Service
                     policy.AllowAnyOrigin();
                 });
             });
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection service)
+        {
+            var builder = service.AddIdentity<AppUser, AppRole>(config =>
+            {
+                config.Password.RequireDigit = false;
+                config.Password.RequireLowercase = false;
+                config.Password.RequireUppercase = false;
+                config.Password.RequireNonAlphanumeric = false;
+                config.Password.RequiredLength = 5;
+                config.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<CommerceDbContext>()
+            .AddDefaultTokenProviders();
         }
 
         public static void ConfigureRepositoryManager(this IServiceCollection service) =>

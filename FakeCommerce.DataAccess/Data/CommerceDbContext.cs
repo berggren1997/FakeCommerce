@@ -1,9 +1,10 @@
 ﻿using FakeCommerce.Entities.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FakeCommerce.DataAccess.Data
 {
-    public class CommerceDbContext : DbContext
+    public class CommerceDbContext : IdentityDbContext<AppUser, AppRole, int>
     {
         public CommerceDbContext(DbContextOptions<CommerceDbContext> options)
             :base(options)

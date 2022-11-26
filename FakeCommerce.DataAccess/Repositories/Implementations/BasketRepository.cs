@@ -15,5 +15,8 @@ namespace FakeCommerce.DataAccess.Repositories.Implementations
             .Include(x => x.Items)
             .ThenInclude(x => x.Product)
             .FirstOrDefaultAsync();
+
+        public void CreateBasket(Basket basket) =>
+            Create(basket);
     }
 }
