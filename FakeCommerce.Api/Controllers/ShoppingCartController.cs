@@ -45,6 +45,8 @@ namespace FakeCommerce.Api.Controllers
                 var cookieOptions = new CookieOptions
                 {
                     IsEssential = true,
+                    SameSite = SameSiteMode.None,
+                    Secure = true,
                     Expires = DateTime.Now.AddDays(30)
                 };
 

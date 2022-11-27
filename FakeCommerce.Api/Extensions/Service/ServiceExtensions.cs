@@ -24,7 +24,9 @@ namespace FakeCommerce.Api.Extensions.Service
                 {
                     policy.AllowAnyHeader();
                     policy.AllowAnyMethod();
-                    policy.AllowAnyOrigin();
+                    policy.WithOrigins("http://localhost:3000");
+                    policy.AllowCredentials();
+                    //policy.AllowAnyOrigin();
                 });
             });
         }
