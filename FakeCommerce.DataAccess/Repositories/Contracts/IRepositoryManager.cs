@@ -6,6 +6,7 @@ namespace FakeCommerce.DataAccess.Repositories.Interfaces
     {
         IProductRepository ProductRepository { get; }
         IBasketRepository BasketRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
         Task SaveAsync();
     }
 }

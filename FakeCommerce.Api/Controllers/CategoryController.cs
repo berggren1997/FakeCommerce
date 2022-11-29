@@ -17,7 +17,8 @@ namespace FakeCommerce.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProductCategories()
         {
-
+            var categories = await _service.CategoryService.GetAllProductCategories(trackChanges: false);
+            return categories != null ? Ok(categories) : NotFound("No categories retrieved from database");
         }
     }
 }

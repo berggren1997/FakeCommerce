@@ -1,5 +1,6 @@
 ﻿using FakeCommerce.Api.Services.Auth;
 using FakeCommerce.Api.Services.Basket;
+using FakeCommerce.Api.Services.Category;
 using FakeCommerce.Api.Services.Products;
 using FakeCommerce.DataAccess.Repositories.Interfaces;
 using FakeCommerce.Entities.Models;
@@ -12,6 +13,7 @@ namespace FakeCommerce.Api.Services
         private readonly Lazy<IProductService> _productService;
         private readonly Lazy<IAuthService> _authService;
         private readonly Lazy<IBasketService> _basketService;
+        private readonly Lazy<ICategoryService> _categoryService;
 
         public ServiceManager(IRepositoryManager repositoryManager, UserManager<AppUser> userManager,
             IConfiguration configuration)
@@ -24,9 +26,13 @@ namespace FakeCommerce.Api.Services
 
             _basketService = new Lazy<IBasketService>(() =>
                 new BasketService(repositoryManager));
+
+            _categoryService = new Lazy<ICategoryService>(() =>
+                new CategoryService(repositoryManager));
         }
         public IProductService ProductService => _productService.Value;
         public IAuthService AuthService => _authService.Value;
         public IBasketService BasketService => _basketService.Value;
+        public ICategoryService CategoryService => _categoryService.Value;
     }
 }

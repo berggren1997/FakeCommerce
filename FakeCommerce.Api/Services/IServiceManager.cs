@@ -1,5 +1,6 @@
 ﻿using FakeCommerce.Api.Services.Auth;
 using FakeCommerce.Api.Services.Basket;
+using FakeCommerce.Api.Services.Category;
 using FakeCommerce.Api.Services.Products;
 
 namespace FakeCommerce.Api.Services
@@ -9,5 +10,6 @@ namespace FakeCommerce.Api.Services
         IProductService ProductService { get; }
         IAuthService AuthService { get; }
         IBasketService BasketService { get; }
+        ICategoryService CategoryService { get; }
     }
 }
