@@ -45,9 +45,32 @@ namespace FakeCommerce.Api.Services.Basket
             return MapBasketToDto(basket);
         }
 
-        public Task<bool> RemoveItemFromBasket(int productId, int quantity)
+        public async Task<BasketDto> RemoveItemFromBasket(int productId, int quantity, string buyerId)
         {
-            throw new NotImplementedException();
+            var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+            
+            if (basket == null) throw new Exception($"Temporary exception: Basket not found in: " +
+                $"{nameof(RemoveItemFromBasket)} method");
+            var product = await _repository.ProductRepository.GetProduct(productId, trackChanges: false);
+            
+            if(product == null) throw new Exception($"Temporary exception: Product not found in: " +
+                $"{nameof(RemoveItemFromBasket)} method, and can not be removed");
+
+            basket.RemoveItem(productId, quantity);
+            await _repository.SaveAsync();
+            return MapBasketToDto(basket);
+        }
+
+        public async Task<BasketDto> ClearCart(string buyerId)
+        {
+            var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+            if (basket == null) 
+                throw new Exception($"No basket found in: {nameof(ClearCart)} method in BasketService");
+            
+            basket.Items.Clear();
+            await _repository.SaveAsync();
+
+            return MapBasketToDto(basket);
         }
         
         public async Task<BasketDto> CreateNewBasket(string buyerId)
