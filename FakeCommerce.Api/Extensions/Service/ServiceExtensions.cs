@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace FakeCommerce.Api.Extensions.Service
@@ -81,6 +82,58 @@ namespace FakeCommerce.Api.Extensions.Service
             service.AddMvc(options =>
             {
                 options.Filters.Add(new ApiKeyAuth());
+            });
+        }
+
+        public static void ConfiugreSwaggerAuthentication(this IServiceCollection services)
+        {
+            services.AddSwaggerGen(s => {
+                s.SwaggerDoc("v1", new OpenApiInfo { Title = "e-commerce api", Version = "v1" });
+                s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place to add JWT with Bearer",
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
+                s.AddSecurityDefinition("api-key", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header,
+                    Description = "Place your Api Key",
+                    Name = "api-key",
+                    Type = SecuritySchemeType.ApiKey
+                });
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            },
+                            Name = "Bearer"
+                        },
+                        new List<string>()
+                    }
+                });
+                s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "api-key"
+                            },
+                            Name = "api-key"
+                        },
+                        new List<string>()
+                    }
+                });
             });
         }
     }

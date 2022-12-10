@@ -12,11 +12,11 @@ namespace FakeCommerce.Api.Filters
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            _expectedApiKey = configuration["ApiSettings:API-KEY"];
+            _expectedApiKey = configuration["ApiSettings:Api-Key"];
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var apiKey = context.HttpContext.Request.Headers["API-KEY"];
+            var apiKey = context.HttpContext.Request.Headers["api-key"];
 
             if(!string.Equals(apiKey, _expectedApiKey, StringComparison.Ordinal))
             {
