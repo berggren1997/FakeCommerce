@@ -12,6 +12,8 @@ builder.Services.ConfigureIdentity();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
+builder.Services.ConfigureJwt(builder.Configuration);
+builder.Services.ConfigureApiKeyAuth();
 var app = builder.Build();
 
 DbInitializer.SeedData(app);

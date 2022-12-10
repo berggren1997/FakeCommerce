@@ -1,4 +1,5 @@
-﻿using FakeCommerce.Api.Services;
+﻿using FakeCommerce.Api.Filters;
+using FakeCommerce.Api.Services;
 using FakeCommerce.Api.ViewModels.Products;
 using Microsoft.AspNetCore.Mvc;
 

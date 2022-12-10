@@ -1,4 +1,5 @@
-﻿using FakeCommerce.Api.Services;
+﻿using FakeCommerce.Api.Filters;
+using FakeCommerce.Api.Services;
 using FakeCommerce.DataAccess.Data;
 using FakeCommerce.DataAccess.Repositories.Implementations;
 using FakeCommerce.DataAccess.Repositories.Interfaces;
@@ -62,7 +63,7 @@ namespace FakeCommerce.Api.Extensions.Service
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
@@ -72,6 +73,14 @@ namespace FakeCommerce.Api.Extensions.Service
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
                     ClockSkew = TimeSpan.Zero
                 };
+            });
+        }
+
+        public static void ConfigureApiKeyAuth(this IServiceCollection service)
+        {
+            service.AddMvc(options =>
+            {
+                options.Filters.Add(new ApiKeyAuth());
             });
         }
     }
