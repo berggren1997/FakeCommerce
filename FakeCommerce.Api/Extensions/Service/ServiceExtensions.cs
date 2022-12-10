@@ -3,8 +3,11 @@ using FakeCommerce.DataAccess.Data;
 using FakeCommerce.DataAccess.Repositories.Implementations;
 using FakeCommerce.DataAccess.Repositories.Interfaces;
 using FakeCommerce.Entities.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace FakeCommerce.Api.Extensions.Service
 {
@@ -53,7 +56,23 @@ namespace FakeCommerce.Api.Extensions.Service
 
         public static void ConfigureJwt(this IServiceCollection service, IConfiguration configuration)
         {
-            //TODO: Lägg till JWT-Auth
+            service.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
         }
     }
 }
