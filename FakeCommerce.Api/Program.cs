@@ -1,3 +1,4 @@
+using FakeCommerce.Api.Extensions.Exceptions;
 using FakeCommerce.Api.Extensions.Service;
 using FakeCommerce.DataAccess.Data;
 
@@ -17,6 +18,8 @@ builder.Services.ConfigureApiKeyAuth();
 builder.Services.ConfiugreSwaggerAuthentication();
 var app = builder.Build();
 
+app.ConfigureExceptionHandler();
+
 DbInitializer.SeedData(app);
 
 if (app.Environment.IsDevelopment())
@@ -28,6 +31,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("DefaultPolicy");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

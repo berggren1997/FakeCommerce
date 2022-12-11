@@ -109,5 +109,19 @@ namespace FakeCommerce.Api.Services.Basket
             };
         }
 
+        public async Task<BasketDto> ClearCartItem(string buyerId, int productId)
+        {
+            var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+            if (basket == null) throw new Exception();
+            //basket.Items = basket.Items.Where(x => x.Id != productId).ToList();
+            var basketItem = basket.Items.FirstOrDefault(x => x.ProductId == productId);
+            if (basketItem != null)
+            {
+                basket.Items.Remove(basketItem);
+                await _repository.SaveAsync();
+            }
+
+            return MapBasketToDto(basket);
+        }
     }
 }

@@ -42,6 +42,15 @@ namespace FakeCommerce.Api.Controllers
             return Ok(newBasket);
         }
 
+        [HttpDelete("clearCartItem/{itemId}")]
+        public async Task<IActionResult> ClearCartItem(int itemId)
+        {
+            var buyerId = GetBuyerId();
+            var newBasket = await _service.BasketService.ClearCartItem(buyerId, itemId);
+
+            return Ok(newBasket);
+        }
+
         [HttpDelete("clearCart")]
         public async Task<IActionResult> ClearCart()
         {

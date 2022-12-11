@@ -9,5 +9,6 @@ namespace FakeCommerce.Api.Services.Basket
         Task<BasketDto> AddItemToBasket(int productId, int quantity, string buyerId);
         Task<BasketDto> RemoveItemFromBasket(int productId, int quantity, string buyerId);
         Task<BasketDto> ClearCart(string buyerId);
+        Task<BasketDto> ClearCartItem(string buyerId, int productId);
     }
 }
