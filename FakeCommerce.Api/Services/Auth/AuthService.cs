@@ -1,4 +1,5 @@
 ﻿using FakeCommerce.Api.ViewModels.User;
+using FakeCommerce.Entities.Exceptions.NotFoundExceptions;
 using FakeCommerce.Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -156,6 +157,22 @@ namespace FakeCommerce.Api.Services.Auth
                 throw new SecurityTokenException("Invalid token.");
             }
             return principal;
+        }
+
+        public async Task<JwtTokenDto> GetCurrentUser(string username)
+        {
+            _currentUser = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == username);
+            if (_currentUser == null)
+            {
+                throw new UserNotFoundException();
+                //return new JwtTokenDto
+                //{
+                //    Username = "nananannanananannananana....... BATMAN",
+                //    AccessToken = "nananannanananannananana....... BATMAN",
+                //    RefreshToken = "nananannanananannananana....... BATMAN"
+                //};
+            }
+            return await CreateJwtToken(true);
         }
     }
 }

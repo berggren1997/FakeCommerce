@@ -9,5 +9,6 @@ namespace FakeCommerce.Api.Services.Auth
         Task<IdentityResult> RegisterUser(CreateUserDto newUser);
         Task<JwtTokenDto> CreateJwtToken(bool populateRefreshToken);
         Task<JwtTokenDto> RefreshAccessToken(string refreshToken);
+        Task<JwtTokenDto> GetCurrentUser(string username);
     }
 }

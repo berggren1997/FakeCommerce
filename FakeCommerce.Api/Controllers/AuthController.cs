@@ -1,5 +1,7 @@
 ﻿using FakeCommerce.Api.Services;
+using FakeCommerce.Api.ViewModels.Basket;
 using FakeCommerce.Api.ViewModels.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FakeCommerce.Api.Controllers
@@ -23,10 +25,17 @@ namespace FakeCommerce.Api.Controllers
                 return BadRequest("Bad credentials");
             
             var jwtKit = await _service.AuthService.CreateJwtToken(populateRefreshToken: true);
-            
+
+            var activeBasket = await GetActiveBasket(authenticateUserDto.Username);
+
             SetRefreshToken(jwtKit.RefreshToken);
             
-            return Ok(new { accessToken = jwtKit.AccessToken, username = jwtKit.Username });
+            return Ok(new 
+            { 
+                accessToken = jwtKit.AccessToken, 
+                username = jwtKit.Username, 
+                basket = activeBasket != null ? activeBasket : new BasketDto()
+            });
         }
 
         [HttpPost("register")]
@@ -54,6 +63,13 @@ namespace FakeCommerce.Api.Controllers
             return Ok(new { accessToken = authResponse.AccessToken, username = authResponse.Username });
         }
 
+        [HttpGet("currentuser"), Authorize]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            var user = await _service.AuthService.GetCurrentUser(User.Identity!.Name!);
+            return Ok(new {accessToken = user.AccessToken, username = user.Username});
+        }
+
         private void SetRefreshToken(string refreshToken)
         {
             var cookieOptions = new CookieOptions
@@ -64,5 +80,25 @@ namespace FakeCommerce.Api.Controllers
             };
             Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
         }
+
+        private async Task<BasketDto?> GetActiveBasket(string username)
+        {
+            var anonymousBasket = await _service.BasketService.GetBasket(GetCurrentBuyerId());
+            var userBasket = await _service.BasketService.GetBasket(username);
+
+            if(anonymousBasket != null)
+            {
+                if(userBasket != null)
+                {
+                    await _service.BasketService.DeleteBasket(username);
+                }
+                await _service.BasketService.TransferAnonymousBasket(GetCurrentBuyerId(), username);
+                Response.Cookies.Delete("buyerId");
+            }
+
+            return anonymousBasket != null ? anonymousBasket : userBasket;
+        }
+
+        private string GetCurrentBuyerId() => Request.Cookies["buyerId"];
     }
 }

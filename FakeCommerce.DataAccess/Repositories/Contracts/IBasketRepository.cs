@@ -7,5 +7,6 @@ namespace FakeCommerce.DataAccess.Repositories.Contracts
         Task<Basket?> GetBasket(string buyerId, bool trackChanges);
 
         void CreateBasket(Basket basket);
+        void RemoveBasket(Basket basket);
     }
 }

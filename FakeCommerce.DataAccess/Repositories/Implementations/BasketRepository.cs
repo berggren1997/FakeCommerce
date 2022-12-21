@@ -18,5 +18,8 @@ namespace FakeCommerce.DataAccess.Repositories.Implementations
 
         public void CreateBasket(Basket basket) =>
             Create(basket);
+
+        public void RemoveBasket(Basket basket) =>
+            Delete(basket);
     }
 }

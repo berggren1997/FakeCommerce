@@ -1,5 +1,6 @@
 ﻿using FakeCommerce.Api.ViewModels.Basket;
 using FakeCommerce.DataAccess.Repositories.Interfaces;
+using FakeCommerce.Entities.Exceptions.NotFoundExceptions;
 
 namespace FakeCommerce.Api.Services.Basket
 {
@@ -49,12 +50,10 @@ namespace FakeCommerce.Api.Services.Basket
         {
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
             
-            if (basket == null) throw new Exception($"Temporary exception: Basket not found in: " +
-                $"{nameof(RemoveItemFromBasket)} method");
+            if (basket == null) throw new BasketNotFoundException();
             var product = await _repository.ProductRepository.GetProduct(productId, trackChanges: false);
             
-            if(product == null) throw new Exception($"Temporary exception: Product not found in: " +
-                $"{nameof(RemoveItemFromBasket)} method, and can not be removed");
+            if(product == null) throw new ProductNotFoundException(productId);
 
             basket.RemoveItem(productId, quantity);
             await _repository.SaveAsync();
@@ -65,7 +64,7 @@ namespace FakeCommerce.Api.Services.Basket
         {
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
             if (basket == null) 
-                throw new Exception($"No basket found in: {nameof(ClearCart)} method in BasketService");
+                throw new BasketNotFoundException();
             
             basket.Items.Clear();
             await _repository.SaveAsync();
@@ -112,7 +111,7 @@ namespace FakeCommerce.Api.Services.Basket
         public async Task<BasketDto> ClearCartItem(string buyerId, int productId)
         {
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
-            if (basket == null) throw new Exception();
+            if (basket == null) throw new BasketNotFoundException();
             //basket.Items = basket.Items.Where(x => x.Id != productId).ToList();
             var basketItem = basket.Items.FirstOrDefault(x => x.ProductId == productId);
             if (basketItem != null)
@@ -122,6 +121,29 @@ namespace FakeCommerce.Api.Services.Basket
             }
 
             return MapBasketToDto(basket);
+        }
+
+        public async Task<BasketDto> TransferAnonymousBasket(string buyerId, string username)
+        {
+            var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+            
+            if (basket == null)
+                throw new BasketNotFoundException();
+
+            basket.BuyerId = username;
+            await _repository.SaveAsync();
+            return MapBasketToDto(basket);
+        }
+
+        public async Task DeleteBasket(string username)
+        {
+            var basket = await _repository.BasketRepository.GetBasket(username, trackChanges: true);
+
+            if(basket != null)
+            {
+                _repository.BasketRepository.RemoveBasket(basket);
+                await _repository.SaveAsync();
+            }
         }
     }
 }
