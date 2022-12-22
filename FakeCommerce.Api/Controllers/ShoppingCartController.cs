@@ -78,6 +78,11 @@ namespace FakeCommerce.Api.Controllers
             return basket;
         }
 
-        private string? GetBuyerId() => User.Identity?.Name ?? Request.Cookies["buyerId"];
+        private string? GetBuyerId()
+        {
+            var userName = User!.Identity!.Name;
+            var buyerId = Request.Cookies["buyerId"];
+            return userName != null ? userName: buyerId;
+        }
     }
 }

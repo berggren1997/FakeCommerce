@@ -114,10 +114,10 @@ namespace FakeCommerce.Api.Services.Auth
         private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
         {
             var tokenOptions = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
+                issuer: _configuration["JwtSettings:Issuer"] ?? null,
+                audience: _configuration["JwtSettings:Audience"] ?? null,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(15),
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: signingCredentials
                 );
 
@@ -172,7 +172,7 @@ namespace FakeCommerce.Api.Services.Auth
                 //    RefreshToken = "nananannanananannananana....... BATMAN"
                 //};
             }
-            return await CreateJwtToken(true);
+            return await CreateJwtToken(false);
         }
     }
 }
