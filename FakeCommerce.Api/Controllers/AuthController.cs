@@ -3,6 +3,7 @@ using FakeCommerce.Api.ViewModels.Basket;
 using FakeCommerce.Api.ViewModels.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace FakeCommerce.Api.Controllers
 {
@@ -55,6 +56,7 @@ namespace FakeCommerce.Api.Controllers
             {
                 return Unauthorized("No valid token");
             }
+            var decodedToken = WebUtility.UrlDecode(refreshToken);
 
             var authResponse = await _service.AuthService.RefreshAccessToken(refreshToken);
 
@@ -67,6 +69,7 @@ namespace FakeCommerce.Api.Controllers
         public async Task<IActionResult> GetCurrentUser()
         {
             var user = await _service.AuthService.GetCurrentUser(User.Identity!.Name!);
+            SetRefreshToken(user.RefreshToken);
             return Ok(new {accessToken = user.AccessToken, username = user.Username});
         }
 
