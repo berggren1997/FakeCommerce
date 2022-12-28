@@ -125,14 +125,22 @@ namespace FakeCommerce.Api.Services.Basket
 
         public async Task<BasketDto> TransferAnonymousBasket(string buyerId, string username)
         {
-            var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+            var anonymousBasket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
             
-            if (basket == null)
+            if (anonymousBasket == null)
                 throw new BasketNotFoundException();
 
-            basket.BuyerId = username;
+            //TODO: Kolla ifall EF ens kan ha trackchanges på två entiteter samtidigt?
+            var oldUserBasket = await _repository.BasketRepository.GetBasket(username, trackChanges: true);
+
+            if(oldUserBasket != null)
+            {
+                _repository.BasketRepository.RemoveBasket(oldUserBasket);
+            }
+
+            anonymousBasket.BuyerId = username;
             await _repository.SaveAsync();
-            return MapBasketToDto(basket);
+            return MapBasketToDto(anonymousBasket);
         }
 
         public async Task DeleteBasket(string username)
