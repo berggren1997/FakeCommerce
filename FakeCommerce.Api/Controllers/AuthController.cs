@@ -35,7 +35,7 @@ namespace FakeCommerce.Api.Controllers
             { 
                 accessToken = jwtKit.AccessToken, 
                 username = jwtKit.Username, 
-                basket = activeBasket != null ? activeBasket : new BasketDto()
+                basket = activeBasket != null ? activeBasket : null
             });
         }
 
@@ -95,13 +95,23 @@ namespace FakeCommerce.Api.Controllers
                 {
                     await _service.BasketService.DeleteBasket(username);
                 }
-                await _service.BasketService.TransferAnonymousBasket(GetCurrentBuyerId(), username);
-                Response.Cookies.Delete("buyerId");
+                var newBasket = await _service.BasketService.TransferAnonymousBasket(GetCurrentBuyerId(), username);
+                Response.Cookies.Delete("buyerId", new CookieOptions()
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                });
+                return newBasket;
             }
 
             return anonymousBasket != null ? anonymousBasket : userBasket;
         }
 
-        private string GetCurrentBuyerId() => Request.Cookies["buyerId"];
+        private string GetCurrentBuyerId()
+        {
+            var buyerId = Request.Cookies["buyerId"] ?? User.Identity.Name;
+
+            return buyerId;
+        }
     }
 }

@@ -5,7 +5,10 @@
         public int Id { get; set; }
         public string BuyerId { get; set; } = string.Empty;
         public List<BasketItem> Items { get; set; } = new();
+        //public string PaymentIntentId { get; set; } = string.Empty;
+        //public string ClientSecret { get; set; } = string.Empty;
 
+        
         /// <summary>
         /// Handles adding products to basket/shopping cart in memory
         /// </summary>
