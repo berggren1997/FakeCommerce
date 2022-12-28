@@ -27,7 +27,9 @@ namespace FakeCommerce.Api.Controllers
             
             var jwtKit = await _service.AuthService.CreateJwtToken(populateRefreshToken: true);
 
-            var activeBasket = await GetActiveBasket(authenticateUserDto.Username);
+            //var activeBasket = await GetActiveBasket(authenticateUserDto.Username);
+
+            await TransferActiveBasket(jwtKit.Username);
 
             SetRefreshToken(jwtKit.RefreshToken);
             
@@ -35,7 +37,7 @@ namespace FakeCommerce.Api.Controllers
             { 
                 accessToken = jwtKit.AccessToken, 
                 username = jwtKit.Username, 
-                basket = activeBasket != null ? activeBasket : null
+                //basket = activeBasket != null ? activeBasket : null
             });
         }
 
@@ -56,7 +58,6 @@ namespace FakeCommerce.Api.Controllers
             {
                 return Unauthorized("No valid token");
             }
-            var decodedToken = WebUtility.UrlDecode(refreshToken);
 
             var authResponse = await _service.AuthService.RefreshAccessToken(refreshToken);
 
@@ -107,9 +108,23 @@ namespace FakeCommerce.Api.Controllers
             return anonymousBasket != null ? anonymousBasket : userBasket;
         }
 
+        private async Task TransferActiveBasket(string username)
+        {
+            var anonymousBuyerId = Request.Cookies["buyerId"];
+            if(anonymousBuyerId != null)
+            {
+                await _service.BasketService.TransferAnonymousBasket(anonymousBuyerId, username);
+                Response.Cookies.Delete("buyerId", new CookieOptions()
+                {
+                    Secure = true,
+                    SameSite = SameSiteMode.None
+                });
+            }
+        }
+
         private string GetCurrentBuyerId()
         {
-            var buyerId = Request.Cookies["buyerId"] ?? User.Identity.Name;
+            var buyerId = Request.Cookies["buyerId"] ?? User?.Identity?.Name;
 
             return buyerId;
         }
