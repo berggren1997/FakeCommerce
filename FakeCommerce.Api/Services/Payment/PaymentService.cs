@@ -1,5 +1,6 @@
 ﻿using FakeCommerce.Api.ViewModels.Basket;
 using Stripe;
+using Stripe.Checkout;
 
 namespace FakeCommerce.Api.Services.Payment
 {
@@ -23,7 +24,7 @@ namespace FakeCommerce.Api.Services.Payment
             var subTotal = basket.BasketItems.Sum(item => item.Quantity * item.Price);
 
             //TODO: Lägg till ett paymentintent som prop för Basket entitet, och BasketDto
-            if(string.IsNullOrEmpty(""))
+            if (string.IsNullOrEmpty(""))
             {
                 var options = new PaymentIntentCreateOptions
                 {
@@ -43,8 +44,45 @@ namespace FakeCommerce.Api.Services.Payment
                 await service.UpdateAsync("", options);
             }
             return intent;
-            
-            throw new NotImplementedException();
+
+        }
+
+        public async Task CreatePaymentSession(List<BasketItemDto> items, string username)
+        {
+            var domain = "http://localhost:3000";
+
+            var transformedItems = items.Select(item => new
+            {
+                description = item.Description,
+                quantity = 1,
+                price_data = new
+                {
+                    currency = "usd",
+                    unit_amount = item.Price * 100,
+                    product_data = new
+                    {
+                        name = item.Name,
+                        images = new[] { item.PictureUrl }
+                    },
+                },
+                price = item.Price,
+            });
+
+            var metaData = new Dictionary<string, string>
+            {
+                { username, "username"}
+            };
+
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = (List<SessionLineItemOptions>)transformedItems,
+                Mode = "payment",
+                //TODO: Skapa en successpage i React
+                SuccessUrl = domain + "/success",
+                CancelUrl = domain + "/checkout",
+                Metadata = metaData
+            };
         }
     }
 }
