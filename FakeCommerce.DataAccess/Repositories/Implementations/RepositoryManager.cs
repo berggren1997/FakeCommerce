@@ -9,6 +9,7 @@ namespace FakeCommerce.DataAccess.Repositories.Implementations
         private readonly Lazy<IProductRepository> _productRepository;
         private readonly Lazy<IBasketRepository> _basketRepository;
         private readonly Lazy<ICategoryRepository> _categoryRepository;
+        private readonly Lazy<IOrderRepository> _orderRepository;
         private readonly CommerceDbContext _context;
 
         public RepositoryManager(CommerceDbContext context)
@@ -23,11 +24,15 @@ namespace FakeCommerce.DataAccess.Repositories.Implementations
 
             _categoryRepository = new Lazy<ICategoryRepository>(() =>
                 new CategoryRepository(context));
+
+            _orderRepository = new Lazy<IOrderRepository>(() =>
+                new OrderRepository(context));
         }
 
         public IProductRepository ProductRepository => _productRepository.Value;
         public IBasketRepository BasketRepository => _basketRepository.Value;
         public ICategoryRepository CategoryRepository => _categoryRepository.Value;
+        public IOrderRepository OrderRepository => _orderRepository.Value;
         public async Task SaveAsync() => await _context.SaveChangesAsync();
     }
 }
