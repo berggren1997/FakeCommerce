@@ -18,11 +18,10 @@ namespace FakeCommerce.Api.Controllers
         }
 
         [HttpPost("create-checkout-session"), Authorize]
-        public async Task<IActionResult> Create([FromBody] List<BasketItemDto> items)
+        public ActionResult Create([FromBody] List<BasketItemDto> items)
         {
-            var username = User?.Identity?.Name;
-            items.ForEach(item => Console.WriteLine(new { username, id = item.ProductId, name = item.Name}));
-            return Ok();
+            var session = _service.PaymentService.CreateCheckoutSession(items, User?.Identity?.Name);
+            return Ok( new { session.Id, session.Url });
         }
     }
 }

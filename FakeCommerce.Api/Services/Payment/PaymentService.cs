@@ -47,42 +47,47 @@ namespace FakeCommerce.Api.Services.Payment
 
         }
 
-        public async Task CreatePaymentSession(List<BasketItemDto> items, string username)
+        public Session CreateCheckoutSession(List<BasketItemDto> items, string username)
         {
-            var domain = "http://localhost:3000";
+            var secretKey = _configuration["StripeSettings:SecretKey"];
+            StripeConfiguration.ApiKey = secretKey;
 
-            var transformedItems = items.Select(item => new
+            var lineItems = new List<SessionLineItemOptions>();
+            items.ForEach(item => lineItems.Add(new SessionLineItemOptions
             {
-                description = item.Description,
-                quantity = 1,
-                price_data = new
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    currency = "usd",
-                    unit_amount = item.Price * 100,
-                    product_data = new
+                    UnitAmountDecimal = item.Price * 100,
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        name = item.Name,
-                        images = new[] { item.PictureUrl }
-                    },
+                        Name = item.Name,
+                        Images = new List<string> { item.PictureUrl }
+                    }
                 },
-                price = item.Price,
-            });
-
+                Quantity = item.Quantity,
+            }));
             var metaData = new Dictionary<string, string>
             {
-                { username, "username"}
+                { username, "user" }
             };
-
             var options = new SessionCreateOptions
             {
+                LineItems = lineItems,
+                ShippingAddressCollection = new SessionShippingAddressCollectionOptions
+                {
+                    AllowedCountries = new List<string> { "US", "SE"}
+                },
                 PaymentMethodTypes = new List<string> { "card" },
-                LineItems = (List<SessionLineItemOptions>)transformedItems,
                 Mode = "payment",
-                //TODO: Skapa en successpage i React
-                SuccessUrl = domain + "/success",
-                CancelUrl = domain + "/checkout",
-                Metadata = metaData
+                //Metadata = metaData,
+                SuccessUrl = "http://localhost:3000/success",
+                CancelUrl = "http://localhost:3000/checkout"
             };
+
+            var service = new SessionService();
+            Session session = service.Create(options);
+            return session;
         }
     }
 }
