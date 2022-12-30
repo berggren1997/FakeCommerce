@@ -93,7 +93,8 @@ namespace FakeCommerce.Api.Services.Payment
                                 PictureUrl = x.Product.PictureUrl,
                                 ProductItemId = x.Product.Id
                             }
-                        }).ToList()
+                        }).ToList(),
+                        Total = basket.Items.Sum(x => x.Product.Price * x.Quantity),
                     };
                     _repository.BasketRepository.RemoveBasket(basket);
                     await _repository.SaveAsync();

@@ -33,7 +33,7 @@ namespace FakeCommerce.Api.Services
                 new CategoryService(repositoryManager));
 
             _paymentService = new Lazy<IPaymentService>(() =>
-                new PaymentService(configuration));
+                new PaymentService(configuration, repositoryManager));
         }
         public IProductService ProductService => _productService.Value;
         public IAuthService AuthService => _authService.Value;
