@@ -15,16 +15,13 @@ namespace FakeCommerce.Api.Services.Basket
 
         public async Task<BasketDto> AddItemToBasket(int productId, int quantity, string buyerId)
         {
-            //Få fram användarens shopping-cart
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
-            //var basket2 = await RetrieveBasket(buyerId);
-            // Check that product exists
+            
             var product = await _repository.ProductRepository.GetProduct(productId, trackChanges: false);
+            
             if (product == null)
-            {
-                //TODO: Kasta custom exception
-                return null;
-            }
+                throw new ProductNotFoundException(productId);
+            
             //basket kan inte vara null här, då kontrollern säkerställer att vi har/skapar en
             //ny shoppingcart innan det läggs till
             basket!.AddItem(product, quantity);
@@ -36,12 +33,9 @@ namespace FakeCommerce.Api.Services.Basket
         public async Task<BasketDto> GetBasket(string buyerId)
         {
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: false);
-            
+
             if (basket is null)
-            {
-                //TODO: Kasta eget fel
-                return null;
-            }
+                throw new BasketNotFoundException();
 
             return MapBasketToDto(basket);
         }
@@ -130,7 +124,6 @@ namespace FakeCommerce.Api.Services.Basket
             if (anonymousBasket == null)
                 throw new BasketNotFoundException();
 
-            //TODO: Kolla ifall EF ens kan ha trackchanges på två entiteter samtidigt?
             var oldUserBasket = await _repository.BasketRepository.GetBasket(username, trackChanges: true);
 
             if(oldUserBasket != null)
