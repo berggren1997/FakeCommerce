@@ -71,7 +71,7 @@ namespace FakeCommerce.Api.Services.Payment
                 {
                     var session = stripeEvent.Data.Object as Session;
                     var user = "get the user";
-                    //TODO: Place order the user, create orders repository etc
+                    //TODO: Place order for the user, create orders repository etc
                 }
                 return true;
             }
