@@ -23,5 +23,20 @@ namespace FakeCommerce.Api.Controllers
             var session = _service.PaymentService.CreateCheckoutSession(items, User?.Identity?.Name);
             return Ok( new { session.Id, session.Url });
         }
+
+        /// <summary>
+        /// Stripe webhook
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> FulfillOrder()
+        {
+            var response = await _service.PaymentService.FulfillOrder(Request);
+            
+            if (!response.Success)
+                return BadRequest(response.Message);
+
+            return Ok(response);
+        }
     }
 }

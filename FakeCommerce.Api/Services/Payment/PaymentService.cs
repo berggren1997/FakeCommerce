@@ -13,40 +13,6 @@ namespace FakeCommerce.Api.Services.Payment
             _configuration = configuration;
         }
 
-        public async Task<PaymentIntent> CreateOrUpdatePaymentIntent(BasketDto basket)
-        {
-            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
-
-            var service = new PaymentIntentService();
-
-            var intent = new PaymentIntent();
-
-            var subTotal = basket.BasketItems.Sum(item => item.Quantity * item.Price);
-
-            //TODO: Lägg till ett paymentintent som prop för Basket entitet, och BasketDto
-            if (string.IsNullOrEmpty(""))
-            {
-                var options = new PaymentIntentCreateOptions
-                {
-                    Amount = subTotal,
-                    Currency = "usd",
-                    PaymentMethodTypes = new List<string> { "card" }
-                };
-                intent = await service.CreateAsync(options);
-            }
-            else
-            {
-                var options = new PaymentIntentUpdateOptions
-                {
-                    Amount = subTotal,
-                };
-                //TODO: Lägg till basketdto's paymentintent som första argument
-                await service.UpdateAsync("", options);
-            }
-            return intent;
-
-        }
-
         public Session CreateCheckoutSession(List<BasketItemDto> items, string username)
         {
             var secretKey = _configuration["StripeSettings:SecretKey"];
@@ -88,6 +54,31 @@ namespace FakeCommerce.Api.Services.Payment
             var service = new SessionService();
             Session session = service.Create(options);
             return session;
+        }
+
+        public async Task<bool> FulfillOrder(HttpRequest req)
+        {
+            var json = await new StreamReader(req.Body).ReadToEndAsync();
+            try
+            {
+                var stripeEvent = EventUtility.ConstructEvent(
+                    json,
+                    req.Headers["Stripe-Signature"],
+                    "PLACEHOLDER FOR WEBHOOK-SECRET"
+                );
+
+                if(stripeEvent.Type == Events.CheckoutSessionCompleted)
+                {
+                    var session = stripeEvent.Data.Object as Session;
+                    var user = "get the user";
+                    //TODO: Place order the user, create orders repository etc
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

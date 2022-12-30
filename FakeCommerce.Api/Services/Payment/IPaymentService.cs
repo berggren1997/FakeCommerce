@@ -6,7 +6,13 @@ namespace FakeCommerce.Api.Services.Payment
 {
     public interface IPaymentService
     {
-        Task<PaymentIntent> CreateOrUpdatePaymentIntent(BasketDto basket);
         Session CreateCheckoutSession(List<BasketItemDto> items, string username);
+        
+        /// <summary>
+        /// Webhook handler that is called when a payment session is completed
+        /// </summary>
+        /// <param name="req"></param>
+        /// <returns></returns>
+        Task<bool> FulfillOrder(HttpRequest req);
     }
 }
