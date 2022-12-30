@@ -33,8 +33,8 @@ namespace FakeCommerce.Api.Controllers
         {
             var response = await _service.PaymentService.FulfillOrder(Request);
             
-            if (!response.Success)
-                return BadRequest(response.Message);
+            if (!response)
+                return BadRequest(response);
 
             return Ok(response);
         }
