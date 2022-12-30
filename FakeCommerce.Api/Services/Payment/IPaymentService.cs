@@ -13,6 +13,6 @@ namespace FakeCommerce.Api.Services.Payment
         /// </summary>
         /// <param name="req"></param>
         /// <returns></returns>
-        Task<bool> FulfillOrder(HttpRequest req);
+        Task<bool> FulfillOrder(HttpRequest req, string buyerId);
     }
 }

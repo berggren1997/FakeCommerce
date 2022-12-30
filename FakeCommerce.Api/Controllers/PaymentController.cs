@@ -25,13 +25,13 @@ namespace FakeCommerce.Api.Controllers
         }
 
         /// <summary>
-        /// Stripe webhook
+        /// Stripe webhook, a user cant trigger this if the user is not authenticated
         /// </summary>
         /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> FulfillOrder()
         {
-            var response = await _service.PaymentService.FulfillOrder(Request);
+            var response = await _service.PaymentService.FulfillOrder(Request, User!.Identity!.Name!);
             
             if (!response)
                 return BadRequest(response);

@@ -1,4 +1,6 @@
 ﻿using FakeCommerce.Api.ViewModels.Basket;
+using FakeCommerce.DataAccess.Repositories.Interfaces;
+using FakeCommerce.Entities.Models.OrderAggregate;
 using Stripe;
 using Stripe.Checkout;
 
@@ -6,11 +8,13 @@ namespace FakeCommerce.Api.Services.Payment
 {
     public class PaymentService : IPaymentService
     {
+        private readonly IRepositoryManager _repository;
         private readonly IConfiguration _configuration;
 
-        public PaymentService(IConfiguration configuration)
+        public PaymentService(IConfiguration configuration, IRepositoryManager repository)
         {
             _configuration = configuration;
+            _repository = repository;
         }
 
         public Session CreateCheckoutSession(List<BasketItemDto> items, string username)
@@ -56,7 +60,8 @@ namespace FakeCommerce.Api.Services.Payment
             return session;
         }
 
-        public async Task<bool> FulfillOrder(HttpRequest req)
+        //TODO: inget här är testat, vet inte ens om det fungerar än
+        public async Task<bool> FulfillOrder(HttpRequest req, string buyerId)
         {
             var json = await new StreamReader(req.Body).ReadToEndAsync();
             try
@@ -70,8 +75,28 @@ namespace FakeCommerce.Api.Services.Payment
                 if(stripeEvent.Type == Events.CheckoutSessionCompleted)
                 {
                     var session = stripeEvent.Data.Object as Session;
-                    var user = "get the user";
-                    //TODO: Place order for the user, create orders repository etc
+                    var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: true);
+                    if (basket == null) return false;
+                    //TODO: Place order for the user
+                    var newOrder = new Order
+                    {
+                        BuyerId = basket.BuyerId,
+                        OrderDate = DateTime.Now,
+                        OrderStatus = OrderStatus.PaymentReceived,
+                        OrderItems = basket.Items.Select(x => new OrderItem
+                        {
+                            Id = x.Id,
+                            Price = x.Product.Price,
+                            ProductItemOrdered = new ProductItemOrdered
+                            {
+                                ProductName = x.Product.Name,
+                                PictureUrl = x.Product.PictureUrl,
+                                ProductItemId = x.Product.Id
+                            }
+                        }).ToList()
+                    };
+                    _repository.BasketRepository.RemoveBasket(basket);
+                    await _repository.SaveAsync();
                 }
                 return true;
             }
