@@ -14,6 +14,9 @@ namespace FakeCommerce.DataAccess.Repositories.Implementations
             Create(order);
 
         public async Task<IEnumerable<Order>> GetUserOrders(string username, bool trackChanges) =>
-            await FindByCondition(x => x.BuyerId == username, trackChanges).ToListAsync();
+            await FindByCondition(x => x.BuyerId == username, trackChanges)
+            .Include(x => x.OrderItems)
+            .ThenInclude(y => y.ProductItemOrdered)
+            .ToListAsync();
     }
 }
