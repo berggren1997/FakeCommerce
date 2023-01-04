@@ -11,10 +11,12 @@ namespace FakeCommerce.Api.Services.Payment
         private readonly IRepositoryManager _repository;
         private readonly IConfiguration _configuration;
 
+        private const string _whSecret = "whsec_af2ab480d565c609162b606bcd161abad9feed5bfd3d8c9024acaced0370027f";
         public PaymentService(IConfiguration configuration, IRepositoryManager repository)
         {
             _configuration = configuration;
             _repository = repository;
+            StripeConfiguration.ApiKey = _configuration["StripeSettings:SecretKey"];
         }
 
         public Session CreateCheckoutSession(List<BasketItemDto> items, string username)
@@ -69,7 +71,7 @@ namespace FakeCommerce.Api.Services.Payment
                 var stripeEvent = EventUtility.ConstructEvent(
                     json,
                     req.Headers["Stripe-Signature"],
-                    "PLACEHOLDER FOR WEBHOOK-SECRET"
+                    _whSecret
                 );
 
                 if(stripeEvent.Type == Events.CheckoutSessionCompleted)
@@ -96,6 +98,7 @@ namespace FakeCommerce.Api.Services.Payment
                         }).ToList(),
                         Total = basket.Items.Sum(x => x.Product.Price * x.Quantity),
                     };
+                    _repository.OrderRepository.CreateOrder(newOrder);
                     _repository.BasketRepository.RemoveBasket(basket);
                     await _repository.SaveAsync();
                 }

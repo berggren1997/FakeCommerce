@@ -14,7 +14,7 @@ builder.Services.ConfigureCors();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureJwt(builder.Configuration);
-builder.Services.ConfigureApiKeyAuth();
+//builder.Services.ConfigureApiKeyAuth();
 builder.Services.ConfiugreSwaggerAuthentication();
 var app = builder.Build();
 

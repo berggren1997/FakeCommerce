@@ -35,7 +35,7 @@ namespace FakeCommerce.Api.Services.Basket
             var basket = await _repository.BasketRepository.GetBasket(buyerId, trackChanges: false);
 
             if (basket is null)
-                throw new BasketNotFoundException();
+                await CreateNewBasket(buyerId);
 
             return MapBasketToDto(basket);
         }

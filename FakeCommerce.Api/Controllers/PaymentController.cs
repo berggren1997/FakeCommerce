@@ -24,10 +24,6 @@ namespace FakeCommerce.Api.Controllers
             return Ok( new { session.Id, session.Url });
         }
 
-        /// <summary>
-        /// Stripe webhook, a user cant trigger this if the user is not authenticated
-        /// </summary>
-        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> FulfillOrder()
         {
