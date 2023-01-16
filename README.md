@@ -19,7 +19,7 @@ The API is consumed by a React Client. [(see project here)](https://github.com/b
 To set the project up, follow these steps:
 
 1. Clone the project to your local machine
-2. Make sure to has SQL Server installed
+2. Make sure to have SQL Server installed
 3. Navigate to the API project in Package Manager Console, run the migrations and create the database by using the command "update-database"
 4. Make sure to set up your own stripe account to get your key, and paste it in appsettings
 
