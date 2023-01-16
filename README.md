@@ -180,7 +180,7 @@ POST /api/auth/login
 }
 ```
 
-## Payment Endpoint (Stripe. For more information on how I created the checkout session, see the PaymentService class)
+## Payment Endpoint (With Stripe)
 
 ### Create Checkout Session Request
 ```js
