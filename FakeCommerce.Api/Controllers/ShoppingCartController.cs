@@ -26,7 +26,13 @@ namespace FakeCommerce.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> AddItemToBasket(int productId, int quantity)
         {
-            var basket = await _service.BasketService.GetBasket(GetBuyerId());
+            var buyerId = GetBuyerId();
+            BasketDto? basket = null;
+
+            if(buyerId != null)
+            {
+                basket = await _service.BasketService.GetBasket(buyerId);
+            }
             if(basket == null)
             {
                 basket = await CreateBasket();

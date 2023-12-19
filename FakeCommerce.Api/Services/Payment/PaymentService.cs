@@ -34,7 +34,7 @@ namespace FakeCommerce.Api.Services.Payment
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
                         Name = item.Name,
-                        Images = new List<string> { item.PictureUrl }
+                        //Images = new List<string> { item.PictureUrl }
                     }
                 },
                 Quantity = item.Quantity,
@@ -52,7 +52,7 @@ namespace FakeCommerce.Api.Services.Payment
                 },
                 PaymentMethodTypes = new List<string> { "card" },
                 Mode = "payment",
-                //Metadata = metaData,
+                Metadata = metaData,
                 SuccessUrl = "http://localhost:3000/success",
                 CancelUrl = "http://localhost:3000/checkout"
             };

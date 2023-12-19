@@ -117,7 +117,7 @@ namespace FakeCommerce.Api.Services.Auth
                 issuer: _configuration["JwtSettings:Issuer"] ?? null,
                 audience: _configuration["JwtSettings:Audience"] ?? null,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(11),
+                expires: DateTime.Now.AddDays(10),
                 signingCredentials: signingCredentials
                 );
 
